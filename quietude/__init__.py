@@ -18,7 +18,7 @@
 
 bl_info = {
     "name": "Quietude",
-    "author": "Dave Keeshan",
+    "author": "Cédric Belmant",
     "version": (0, 0, 1),
     "blender": (2, 80, 0),
     "category": "Object",
@@ -29,5 +29,5 @@ def register():
     print("Hello World")
 
 
-def unregister():  # pragma: no cover
+def unregister():
     print("Goodbye World")
