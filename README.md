@@ -2,24 +2,6 @@
 [![Github Build Status](https://github.com/douglaskastle/blender-fake-addon/workflows/blender-fake-addon/badge.svg)](https://github.com/douglaskastle/blender-fake-addon/actions)
 [![codecov](https://codecov.io/gh/douglaskastle/blender-fake-addon/branch/master/graph/badge.svg)](https://codecov.io/gh/douglaskastle/blender-fake-addon)
 
-# Blender - pytest - TravisCI integration
-
-The code to shows how the `pytest` can be used inside blender to test an addon.  Once a checkin has been performed TravisCI runs the tests on the current releases and nightly builds for blender.
-
-## Motivation
-
-I have been around python for the better part of 10 years now.  Python is only just coming of that painful period of time when it transitioned from python2 to python3.  We got there, yay!
-
-I have been playing around with blender for 3-4 years and the move to blender 2.80 from 2.79 is beginning to look very similar.
-
-One obvious area of concern is that the addons used in blender are hardly ever written with any tests.  If an addon was written for 2.56 it may or may not work for 2.65. It usually did, so that has allowed some great work to live on.  However the move to 2.80 is really beginning to flag where we suffer for lack of regressable testing.
-
-My new years resolution (2019) was to at least see if I could put together a decent test framework that could allow for regressable tests, on multiple builds of blender, and have it feed into a continous integration tool, in this case TravisCI, that can run against the nightly builds.  
-
-I have also picked `pytest` as I have experience with this from my day job as a microchip validation engineer.  And it is non standard enough that the work here shows how you can get any python module you want into blender.
-
-Where possible I try and script in python only.  Some other work I have seen, usually the wrapper script, can be written in bash/sh.  That can wreck my head, so here all scripts where possible have been written in python for greater code continuity.
-
 ## pytest
 
 Blender comes with it own version of python.  When you run blender, the python it uses, is this one, not the one that has been installed on your system.  This python comes with has `unittest` as a standard module.  `unittest` is a bit long in the tooth, `pytest` has started to become a lot more popular in the industry. 
