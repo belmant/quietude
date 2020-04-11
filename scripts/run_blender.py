@@ -5,19 +5,11 @@ import re
 from glob import glob
 
 
-def checkPath(path):
-    if "cygwin" == sys.platform:
-        cmd = "cygpath -wa {0}".format(path)
-        path = subprocess.check_output(cmd.split()).decode("ascii").rstrip()
-    return path
-
-
 def main(blender, test_file):
-    test_file = checkPath(test_file)
-    local_python = checkPath(os.getcwd() + "/scripts")
+    local_python = os.path.join(os.getcwd(), "scripts")
     os.environ["LOCAL_PYTHONPATH"] = local_python
 
-    cmd = f'{blender} -b --python "{test_file}"'
+    cmd = f'.{os.sep}{blender} -b --python "{test_file}"'
     result = int(os.system(cmd))
     if 0 == result:
         return 0
@@ -25,21 +17,31 @@ def main(blender, test_file):
         return 1
 
 
-if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        blender_rev = sys.argv[1]
-    else:
-        blender_rev = "2.80"
+def parse_cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--version', type=str, default='2.82', help="Blender version to fetch.")
+    args = parser.parse_args()
+    return args.version
 
-    if "win32" == sys.platform or "win64" == sys.platform or "cygwin" == sys.platform:
+
+def get_executable_extension():
+    if "win32" == sys.platform or "win64" == sys.platform:
         ext = ".exe"
     else:
         ext = ""
+    return ext
 
-    files = glob(f"../blender-{blender_rev}*/blender{ext}")
-    if not 1 == len(files):
+
+if __name__ == "__main__":
+
+    blender_version = parse_cli()
+
+    ext = get_executable_extension()
+
+    files = glob(f"external{os.sep}blender-{blender_version}*{os.sep}blender{ext}")
+    if len(files) != 1:
         raise Exception(f"Too many blenders returned: {files}")
-    
+
     blender = os.path.realpath(files[0])
 
     test_file = "scripts/load_pytest.py"

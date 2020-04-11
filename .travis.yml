@@ -44,7 +44,8 @@ install:
 
 script:
     - cd ${TRAVIS_BUILD_DIR}
-    - ../blender-${BLENDER_VERSION}/blender.exe --version
+    - cd external/blender-${BLENDER_VERSION}/blender.exe
+    - ./blender.exe --version
     - python ${TRAVIS_BUILD_DIR}/scripts/run_blender.py ${BLENDER_VERSION}
     - ls
     # - bash <(curl -s https://codecov.io/bash)
