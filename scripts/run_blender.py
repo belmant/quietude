@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import subprocess
@@ -10,6 +11,7 @@ def main(blender, test_file):
     os.environ["LOCAL_PYTHONPATH"] = local_python
 
     cmd = f'.{os.sep}{blender} -b --python "{test_file}"'
+    print(cmd)
     result = int(os.system(cmd))
     if 0 == result:
         return 0
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     if len(files) != 1:
         raise Exception(f"Too many blenders returned: {files}")
 
-    blender = os.path.realpath(files[0])
+    blender = files[0]
 
     test_file = "scripts/load_pytest.py"
 

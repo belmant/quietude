@@ -1,8 +1,8 @@
-ADDON = "fake_addon"
-
-import os
-import sys
 import pytest
+import sys
+import os
+ADDON = "quietude"
+
 
 try:
     sys.path.append(os.environ["LOCAL_PYTHONPATH"])
@@ -23,14 +23,14 @@ class SetupPlugin:
         config.cache.set("bpy_module", self.bpy_module)
 
     def pytest_unconfigure(self):
-#         cmd = "coverage xml"
-#         os.system(cmd)
+        #         cmd = "coverage xml"
+        #         os.system(cmd)
         cleanup(self.addon, self.bpy_module, self.addon_dir)
         print("*** test run reporting finished")
 
 
 try:
-    exit_val = pytest.main(["tests", "-v", "-x", "--cov", "--cov-report", "term-missing", "--cov-report", "xml",], plugins=[SetupPlugin(ADDON)])
+    exit_val = pytest.main(["tests", "-v", "-x", "--cov", "--cov-report", "term-missing", "--cov-report", "xml", ], plugins=[SetupPlugin(ADDON)])
 except Exception as e:
     print(e)
     exit_val = 1

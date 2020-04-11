@@ -43,8 +43,7 @@ install:
     - python ${TRAVIS_BUILD_DIR}/scripts/get_blender.py --version=${BLENDER_VERSION}
 
 script:
-    - cd ${TRAVIS_BUILD_DIR}
-    - cd external/blender-${BLENDER_VERSION}/blender.exe
+    - cd ${TRAVIS_BUILD_DIR}/external/blender-${BLENDER_VERSION}
     - ./blender.exe --version
     - python ${TRAVIS_BUILD_DIR}/scripts/run_blender.py --version=${BLENDER_VERSION}
     - ls
