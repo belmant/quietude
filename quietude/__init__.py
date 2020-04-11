@@ -26,8 +26,8 @@ bl_info = {
 
 
 def register():
-    print("Hello World")
+    print("Quietude registered.")
 
 
 def unregister():
-    print("Goodbye World")
+    print("Unregistering Quietude.")

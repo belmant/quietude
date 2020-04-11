@@ -1,32 +1,30 @@
 import pytest
 import sys
 import os
-ADDON = "quietude"
 
+
+ADDON = "quietude"
 
 try:
     sys.path.append(os.environ["LOCAL_PYTHONPATH"])
-    from addon_helper import zip_addon, change_addon_dir, cleanup
+    import addon_helper
 except Exception as e:
     print(e)
     sys.exit(1)
 
 
 class SetupPlugin:
-    def __init__(self, addon):
-        self.addon = addon
-        self.addon_dir = "local_addon"
+    def __init__(self, addon_name):
+        self.addon_name = addon_name
 
     def pytest_configure(self, config):
-        (self.bpy_module, self.zfile) = zip_addon(self.addon, self.addon_dir)
-        change_addon_dir(self.bpy_module, self.zfile, self.addon_dir)
-        config.cache.set("bpy_module", self.bpy_module)
+        addon_helper.install_addon(self.addon_name)
 
     def pytest_unconfigure(self):
         #         cmd = "coverage xml"
         #         os.system(cmd)
-        cleanup(self.addon, self.bpy_module, self.addon_dir)
-        print("*** test run reporting finished")
+        addon_location = addon_helper.get_addon_location(self.addon_name)
+        addon_helper.disable(self.addon_name)
 
 
 try:

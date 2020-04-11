@@ -1,19 +1,16 @@
 import pytest
 from addon_helper import get_version
 
-
-@pytest.fixture
-def bpy_module(cache):
-    return cache.get("bpy_module", None)
+ADDON = 'quietude'
 
 
-def test_versionID_pass(bpy_module):
+def test_versionID_pass():
     expect_version = (0, 0, 1)
-    return_version = get_version(bpy_module)
+    return_version = get_version(ADDON)
     assert expect_version == return_version
 
 
-def test_versionID_fail(bpy_module):
+def test_versionID_fail():
     expect_version = (0, 1, 1)
-    return_version = get_version(bpy_module)
+    return_version = get_version(ADDON)
     assert not expect_version == return_version

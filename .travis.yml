@@ -9,7 +9,7 @@ env:
         - BLENDER_CACHE=$HOME/.cache/blender
     matrix:
         - BLENDER_VERSION="2.80"
-        - BLENDER_VERSION="2.81a"
+        - BLENDER_VERSION="2.81"
         - BLENDER_VERSION="2.82"
         - BLENDER_VERSION="2.83"
 
@@ -25,12 +25,11 @@ before_install:
     - python scripts/travis/before_install.py
 install:
     - python --version
-    - python scripts/travis/get_blender.py --version=${BLENDER_VERSION}
+    - python scripts/travis/get_blender.py --bversion=${BLENDER_VERSION}
 
 script:
     - ./external/blender-${BLENDER_VERSION}/blender.exe --version
-    - python scripts/run_blender.py --version=${BLENDER_VERSION}
-    - ls
+    - python scripts/run_blender.py --bversion=${BLENDER_VERSION} --test
     # - bash <(curl -s https://codecov.io/bash)
 
 #after_success:

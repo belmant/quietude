@@ -5,57 +5,45 @@ import time
 import zipfile
 import shutil
 import bpy
+import bpy.path
 
 
-def zip_addon(addon, addon_dir):
-    bpy_module = re.sub(".py", "", os.path.basename(os.path.realpath(addon)))
-
-    if os.path.isdir(addon_dir):
-        shutil.rmtree(addon_dir)
-    os.mkdir(addon_dir)
-
-    zfile = os.path.realpath(bpy_module + ".zip")
-
-    print("Zipping addon - {0}".format(bpy_module))
-
-    zf = zipfile.ZipFile(zfile, "w")
-    if os.path.isdir(addon):
-        for dirname, subdirs, files in os.walk(addon):
+def zip_target(target, target_location):
+    if target_location is None:
+        target_location = target + ".zip"
+    zf = zipfile.ZipFile(target_location, "w")
+    if os.path.isdir(target):
+        for dirname, subdirs, files in os.walk(target):
+            print(f"Writing {dirname} to archive.")
             zf.write(dirname)
             for filename in files:
-                zf.write(os.path.join(dirname, filename))
+                print(f"Writing {filename} to archive.")
+                zf.write('/'.join((dirname, filename)))
     else:
-        zf.write(addon)
+        zf.write(target)
     zf.close()
-    return (bpy_module, zfile)
 
 
-def change_addon_dir(bpy_module, zfile, addon_dir):
-    print("Change addon dir - {0}".format(addon_dir))
+def get_addon_location(addon_name):
+    final_location = os.path.join(bpy.context.preferences.filepaths.script_directory, addon_name)
+    return final_location
 
 
-    if (2, 80, 0) < bpy.app.version:
-        bpy.context.preferences.filepaths.script_directory = addon_dir
-        bpy.utils.refresh_script_paths()
-        bpy.ops.preferences.addon_install(overwrite=True, filepath=zfile)
-        bpy.ops.preferences.addon_enable(module=bpy_module)
-    else:
-        bpy.context.user_preferences.filepaths.script_directory = addon_dir
-        bpy.utils.refresh_script_paths()
-        bpy.ops.wm.addon_install(overwrite=True, filepath=zfile)
-        bpy.ops.wm.addon_enable(module=bpy_module)
+def install_addon(addon_name):
+    source_location = addon_name
+    zip_location = source_location + ".zip"
+    if os.path.exists(zip_location):
+        os.remove(zip_location)
+
+    zip_target(source_location, zip_location)
+    bpy.ops.preferences.addon_install(overwrite=True, filepath=os.path.abspath(zip_location))
+    bpy.ops.preferences.addon_enable(module=addon_name)
 
 
-def cleanup(addon, bpy_module, addon_dir):
-    print("Cleaning up - {}".format(bpy_module))
-    if (2, 80, 0) < bpy.app.version:
-        bpy.ops.preferences.addon_disable(module=bpy_module)
-    else:
-        bpy.ops.wm.addon_disable(module=bpy_module)
-    if os.path.isdir(addon_dir):
-        shutil.rmtree(addon_dir)
+def disable(addon_name):
+    bpy.ops.preferences.addon_disable(module=addon_name)
 
 
-def get_version(bpy_module):
-    mod = sys.modules[bpy_module]
+def get_version(addon_name):
+    mod = sys.modules[addon_name]
     return mod.bl_info.get("version", (-1, -1, -1))

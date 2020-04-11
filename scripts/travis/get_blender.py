@@ -127,6 +127,11 @@ def move_blender_archive_to_dest(cache_dir, dst, archive):
     shutil.move(src, dst)
 
 
+def create_config(archive, blender_version):
+    config_path = os.path.join(archive, blender_version, "config")
+    os.makedirs(config_path)
+
+
 def get_blender(blender_version, blender_zippath, nightly):
     cwd = os.getcwd()
     external_dir = "external"  # target directory
@@ -137,6 +142,7 @@ def get_blender(blender_version, blender_zippath, nightly):
     blender_zipfile = blender_zippath.split("/")[-1]
     download_blender(blender_zipfile, blender_zippath)
     archive, files = uncompress_archive(blender_zipfile)
+    create_config(archive, blender_version)
 
     # os.remove(blender_zipfile)
 
@@ -156,9 +162,9 @@ def get_blender(blender_version, blender_zippath, nightly):
 
 def parse_cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--version', type=str, default='2.82', help="Blender version to fetch.")
+    parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to fetch.")
     args = parser.parse_args()
-    return args.version
+    return args.bversion
 
 
 def main():
