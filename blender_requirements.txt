@@ -3,3 +3,4 @@ yolk3k
 pytest
 coverage
 pytest-cov
+wrapt==1.11
