@@ -14,6 +14,8 @@ env:
         - BLENDER_VERSION="2.83"
 
 language: python
+python:
+    - "3.7"
 
 cache:
     directories:
@@ -27,6 +29,7 @@ addons:
 before_install:
     - python scripts/travis/before_install.py
 install:
+    - python -m pip install -r requirements.txt
     - python --version
     - python scripts/travis/get_blender.py --version=${BLENDER_VERSION}
 
