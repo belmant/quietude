@@ -14,10 +14,8 @@ def zip_target(target, target_location):
     zf = zipfile.ZipFile(target_location, "w")
     if os.path.isdir(target):
         for dirname, subdirs, files in os.walk(target):
-            print(f"Writing {dirname} to archive.")
             zf.write(dirname)
             for filename in files:
-                print(f"Writing {filename} to archive.")
                 zf.write('/'.join((dirname, filename)))
     else:
         zf.write(target)

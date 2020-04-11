@@ -144,7 +144,7 @@ def get_blender(blender_version, blender_zippath, nightly):
     archive, files = uncompress_archive(blender_zipfile)
     create_config(archive, blender_version)
 
-    # os.remove(blender_zipfile)
+    os.remove(blender_zipfile)
 
     python = get_python_executable(files)
     os.chdir(cwd)

@@ -5,14 +5,12 @@ import subprocess
 import re
 from glob import glob
 
-test_file = "scripts/load_pytest.py"
 
-
-def main(blender, blender_flags, test_flag=''):
+def main(blender, blender_flags, python_call):
     local_python = os.path.join(os.getcwd(), "scripts")
     os.environ["LOCAL_PYTHONPATH"] = local_python
 
-    cmd = f".{os.sep}{blender} {test_flag}{''.join(blender_flags)}"
+    cmd = f".{os.sep}{blender} {' '.join(blender_flags)} {python_call}"
     print(cmd)
     result = int(os.system(cmd))
     if 0 == result:
@@ -23,10 +21,23 @@ def main(blender, blender_flags, test_flag=''):
 
 def parse_cli():
     parser = argparse.ArgumentParser()
+
+    python_flag_names = ["--test"]
+    python_flags = []
+
     parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to run.")
-    parser.add_argument('--test', action='store_true', help="Runs tests only.")
-    args, unknown_args = parser.parse_known_args()
-    return args.bversion, args.test, unknown_args
+    parser.add_argument(python_flag_names[0], action='store_true', help="Runs tests only.")
+    args, blender_flags = parser.parse_known_args()
+
+    for name in python_flag_names:
+        flag = getattr(args, name.strip('--'))
+        if flag:
+            if isinstance(flag, bool):
+                python_flags.append(name)
+            else:
+                python_flags.append(f"{name}={flag}")
+
+    return args.bversion, blender_flags, python_flags
 
 
 def get_executable_extension():
@@ -39,7 +50,7 @@ def get_executable_extension():
 
 if __name__ == "__main__":
 
-    blender_version, test, blender_flags = parse_cli()
+    blender_version, blender_flags, python_flags = parse_cli()
 
     ext = get_executable_extension()
 
@@ -52,12 +63,14 @@ if __name__ == "__main__":
 
     blender = blender_executables[0]
 
-    if test:
-        test_flag = f"--python \"{test_file}\" "
-        if '-b' not in blender_flags:
-            blender_flags.append('-b')
-    else:
-        test_flag = ''
+    python_file = "scripts/loader.py"
+    python_call = f"--python \"{python_file}\""
 
-    exit_val = main(blender, blender_flags, test_flag=test_flag)
+    if "--test" in python_flags and '-b' not in blender_flags:
+        blender_flags.append('-b')
+
+    if python_flags:
+        python_call += f" -- {' '.join(python_flags)}"
+
+    exit_val = main(blender, blender_flags, python_call)
     sys.exit(exit_val)
