@@ -31,7 +31,7 @@ def main():
     test = parse_cli()
     if test:
         try:
-            exit_val = pytest.main(["tests", "-v", "-x"])
+            exit_val = pytest.main(["tests", "-v"])
         except Exception as e:
             print(e)
             exit_val = 1
