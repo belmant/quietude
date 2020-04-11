@@ -28,7 +28,6 @@ install:
     - python scripts/travis/get_blender.py --bversion=${BLENDER_VERSION}
 
 script:
-    - ./external/blender-${BLENDER_VERSION}/blender.exe --version
     - python scripts/run_blender.py --bversion=${BLENDER_VERSION} --test
     # - bash <(curl -s https://codecov.io/bash)
 
