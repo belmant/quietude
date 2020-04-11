@@ -115,9 +115,11 @@ def download_blender(blender_zipfile, blender_zippath):
 
 def install_python_dependencies(python):
     cwd = os.getcwd()
-    cmd = f"{python} -m ensurepip install --upgrade -r {cwd}{os.sep}blender_requirements.txt -r {cwd}{os.sep}requirements.txt"
-    print("Installing python dependencies.")
-    os.system(cmd)
+    print("Installing pip.")
+    os.system(f"{python} -m ensurepip")
+    os.system(f"{python} -m pip install -U pip")
+    print("Installing Python dependencies.")
+    os.system(f"{python} -m pip install --upgrade -r {cwd}{os.sep}blender_requirements.txt -r {cwd}{os.sep}requirements.txt")
 
 
 def move_blender_archive_to_dest(cache_dir, dst, archive):
