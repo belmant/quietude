@@ -65,7 +65,7 @@ def get_python_executable(zfiles):
     for zfile in zfiles:
         if re.search(f"bin/python.exe", zfile) or re.search(f"bin/python\d.\d", zfile):
             python = os.path.realpath(zfile)
-    return python
+    return os.path.realpath(python)
 
 
 def get_archive_references(blender_zipfile):
@@ -81,6 +81,16 @@ def get_archive_references(blender_zipfile):
         zfiles = z.getnames()
     zdir = zfiles[0].split("/")[0]
     return z, zdir, zfiles
+
+
+def uncompress_archive(blender_zipfile):
+    z, archive, files = get_archive_references(blender_zipfile)
+    # uncompress
+    if not os.path.isdir(archive):
+        print(f"Unpacking {blender_zipfile}.")
+        z.extractall()
+    z.close()
+    return archive, files
 
 
 def enter_cache_dir():
@@ -103,15 +113,16 @@ def download_blender(blender_zipfile, blender_zippath):
                 ofile.write(r.content)
 
 
-def install_python_dependencies(cwd, python):
-    cmd = f"{python} -m pip install --upgrade -r {cwd}{os.sep}blender_requirements.txt -r {cwd}{os.sep}scripts{os.sep}requirements.txt"
+def install_python_dependencies(python):
+    cwd = os.getcwd()
+    cmd = f"{python} -m pip install --upgrade -r {cwd}{os.sep}blender_requirements.txt -r {cwd}{os.sep}requirements.txt"
     os.system(cmd)
 
 
-def move_blender_archive_to_dest(cache_dir, dst, blender_archive):
+def move_blender_archive_to_dest(cache_dir, dst, archive):
     if os.path.exists(dst):
         shutil.rmtree(dst)
-    src = os.path.join(cache_dir, blender_archive)
+    src = os.path.join(cache_dir, archive)
     print(f"Moving {src} to {dst}.")
     shutil.move(src, dst)
 
@@ -125,21 +136,13 @@ def get_blender(blender_version, blender_zippath, nightly):
 
     blender_zipfile = blender_zippath.split("/")[-1]
     download_blender(blender_zipfile, blender_zippath)
-    z, zdir, zfiles = get_archive_references(blender_zipfile)
+    archive, files = uncompress_archive(blender_zipfile)
 
-    # uncompress archive
-    if not os.path.isdir(zdir):
-        print(f"Unpacking {blender_zipfile}.")
-        z.extractall()
-    z.close()
-    blender_archive = zdir
     # os.remove(blender_zipfile)
 
-    python = get_python_executable(zfiles)
-
-    install_python_dependencies(cwd, python)
-
+    python = get_python_executable(files)
     os.chdir(cwd)
+    install_python_dependencies(python)
 
     shutil.rmtree(os.path.join("tests", "__pycache__"), ignore_errors=True)
 
@@ -148,7 +151,7 @@ def get_blender(blender_version, blender_zippath, nightly):
         ext = "-nightly"
     dst = f"{external_dir}{os.sep}blender-{blender_version}{ext}"
 
-    move_blender_archive_to_dest(cache_dir, dst, blender_archive)
+    move_blender_archive_to_dest(cache_dir, dst, archive)
 
 
 def parse_cli():
@@ -158,18 +161,19 @@ def parse_cli():
     return args.version
 
 
-def main(blender_version):
+def main():
+    blender_version = parse_cli()
+    try:
+        build_dir = os.environ["TRAVIS_BUILD_DIR"]
+        os.chdir(build_dir)
+    except KeyError:
+        pass
 
+    if "-" in blender_version:
+        blender_version = blender_version.split("-")[0]
     blender_zipfile, nightly = get_suffix(blender_version)
-
     get_blender(blender_version, blender_zipfile, nightly)
 
 
 if __name__ == "__main__":
-
-    blender_version = parse_cli()
-
-    if "-" in blender_version:
-        blender_version = blender_version.split("-")[0]
-
-    main(blender_version)
+    main()

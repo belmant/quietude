@@ -7,22 +7,17 @@ os:
 env:
     global:
         - BLENDER_CACHE=$HOME/.cache/blender
-        - VENV_CACHE=$HOME/.cache/venv
-        - PYTHON_REV=3.7.5
     matrix:
         - BLENDER_VERSION="2.80"
         - BLENDER_VERSION="2.81a"
         - BLENDER_VERSION="2.82"
         - BLENDER_VERSION="2.83"
 
-language: bash
+language: python
 
 cache:
-    apt: true
     directories:
-        - $HOME/.cache/pip
         - ${BLENDER_CACHE}
-        - ${VENV_CACHE}
 
 addons:
     apt:
@@ -30,22 +25,14 @@ addons:
             - blender
 
 before_install:
-    - mkdir -p ${BLENDER_CACHE}
-    - ls ${BLENDER_CACHE}
-    - mkdir -p ${VENV_CACHE}
-    - source ${TRAVIS_BUILD_DIR}/scripts/get_python.sh
-    - pip install -r ${TRAVIS_BUILD_DIR}/scripts/requirements.txt --upgrade
-    - yolk -l
-
+    - python scripts/travis/before_install.py
 install:
-    - cd $TRAVIS_BUILD_DIR
     - python --version
-    - python ${TRAVIS_BUILD_DIR}/scripts/get_blender.py --version=${BLENDER_VERSION}
+    - python scripts/travis/get_blender.py --version=${BLENDER_VERSION}
 
 script:
-    - cd ${TRAVIS_BUILD_DIR}/external/blender-${BLENDER_VERSION}
-    - ./blender.exe --version
-    - python ${TRAVIS_BUILD_DIR}/scripts/run_blender.py --version=${BLENDER_VERSION}
+    - ./external/blender-${BLENDER_VERSION}/blender.exe --version
+    - python scripts/run_blender.py --version=${BLENDER_VERSION}
     - ls
     # - bash <(curl -s https://codecov.io/bash)
 
