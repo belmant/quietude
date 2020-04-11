@@ -30,7 +30,12 @@ def main():
     addon_helper.install_addon(ADDON)
     test = parse_cli()
     if test:
-        pytest.main(["tests", "-v", "-x"])
+        try:
+            exit_val = pytest.main(["tests", "-v", "-x"])
+        except Exception as e:
+            print(e)
+            exit_val = 1
+        sys.exit(exit_val)
 
 
 if __name__ == '__main__':
