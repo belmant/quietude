@@ -2,7 +2,6 @@ import os
 import sys
 import argparse
 import pytest
-import bpy
 
 try:
     sys.path.append(os.environ["LOCAL_PYTHONPATH"])
@@ -26,16 +25,20 @@ def parse_cli():
     return args.test
 
 
+def run_pytest():
+    try:
+        exit_val = pytest.main(["tests", "-v"])
+    except Exception as e:
+        print(e)
+        exit_val = 1
+    sys.exit(exit_val)
+
+
 def main():
     addon_helper.install_addon(ADDON)
     test = parse_cli()
     if test:
-        try:
-            exit_val = pytest.main(["tests", "-v"])
-        except Exception as e:
-            print(e)
-            exit_val = 1
-        sys.exit(exit_val)
+        run_pytest()
 
 
 if __name__ == '__main__':

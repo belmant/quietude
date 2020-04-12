@@ -22,11 +22,6 @@ def zip_target(target, target_location):
     zf.close()
 
 
-def get_addon_location(addon_name):
-    final_location = os.path.join(bpy.context.preferences.filepaths.script_directory, addon_name)
-    return final_location
-
-
 def install_addon(addon_name):
     source_location = addon_name
     zip_location = source_location + ".zip"
@@ -45,3 +40,8 @@ def disable(addon_name):
 def get_version(addon_name):
     mod = sys.modules[addon_name]
     return mod.bl_info.get("version", (-1, -1, -1))
+
+
+def get_addon_location(addon_name):
+    final_location = os.path.join(bpy.context.preferences.filepaths.script_directory, addon_name)
+    return final_location

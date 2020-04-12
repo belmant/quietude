@@ -6,6 +6,35 @@ import re
 from glob import glob
 
 
+def parse_cli():
+    parser = argparse.ArgumentParser()
+
+    python_flag_names = ["--test"]
+    python_flags = []
+
+    parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to run.")
+    parser.add_argument(python_flag_names[0], action='store_true', help="Runs tests only.")
+    args, blender_flags = parser.parse_known_args()
+
+    for flag in python_flag_names:
+        value = getattr(args, flag.strip('--'))
+        if value:
+            if isinstance(value, bool):
+                python_flags.append(flag)
+            else:
+                python_flags.append(f"{flag}={value}")
+
+    return args.bversion, blender_flags, python_flags
+
+
+def get_executable_extension():
+    if sys.platform in ["win32", "win64"]:
+        ext = ".exe"
+    else:
+        ext = ""
+    return ext
+
+
 def main(blender, blender_flags, python_call):
     local_python = os.path.join(os.getcwd(), "scripts")
     os.environ["LOCAL_PYTHONPATH"] = local_python
@@ -17,35 +46,6 @@ def main(blender, blender_flags, python_call):
         return 0
     else:
         return 1
-
-
-def parse_cli():
-    parser = argparse.ArgumentParser()
-
-    python_flag_names = ["--test"]
-    python_flags = []
-
-    parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to run.")
-    parser.add_argument(python_flag_names[0], action='store_true', help="Runs tests only.")
-    args, blender_flags = parser.parse_known_args()
-
-    for name in python_flag_names:
-        flag = getattr(args, name.strip('--'))
-        if flag:
-            if isinstance(flag, bool):
-                python_flags.append(name)
-            else:
-                python_flags.append(f"{name}={flag}")
-
-    return args.bversion, blender_flags, python_flags
-
-
-def get_executable_extension():
-    if sys.platform in ["win32", "win64"]:
-        ext = ".exe"
-    else:
-        ext = ""
-    return ext
 
 
 if __name__ == "__main__":
