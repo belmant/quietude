@@ -9,15 +9,16 @@ from glob import glob
 def parse_cli():
     parser = argparse.ArgumentParser()
 
-    python_flag_names = ["--test"]
+    python_flag_names = ["--test", "--install"]
     python_flags = []
 
     parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to run.")
     parser.add_argument(python_flag_names[0], action='store_true', help="Runs tests only.")
+    parser.add_argument(python_flag_names[1], action='store_true', help="Installs the addon (zips it and imports it from within Blender).")
     args, blender_flags = parser.parse_known_args()
 
     for flag in python_flag_names:
-        value = getattr(args, flag.strip('--'))
+        value = getattr(args, flag.strip('--').replace('-', '_'))
         if value:
             if isinstance(value, bool):
                 python_flags.append(flag)
@@ -51,8 +52,8 @@ def main(blender, blender_flags, python_call):
 if __name__ == "__main__":
 
     blender_version, blender_flags, python_flags = parse_cli()
-
     ext = get_executable_extension()
+    python_flags.append(f'--bversion={blender_version}')
 
     blender_executables = glob(f"external{os.sep}blender-{blender_version}*{os.sep}blender{ext}")
     if not blender_executables:

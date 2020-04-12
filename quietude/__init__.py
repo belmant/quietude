@@ -16,6 +16,34 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import importlib
+from .log import logger
+
+reimport = 'bpy' in locals()
+if reimport:
+
+    logger.debug("Reimporting all modules.")
+
+if reimport:
+    importlib.reload(auto_load)
+else:
+    from . import auto_load
+
+auto_load.init_modules()
+
+if reimport:
+    for module in auto_load.modules:
+        if 'auto_load' not in module.__name__:
+            importlib.reload(module)
+else:
+    for module in auto_load.modules:
+        if 'auto_load' not in module.__name__:
+            importlib.import_module(module.__name__)
+
+auto_load.init_classes()
+
+import bpy
+
 bl_info = {
     "name": "Quietude",
     "author": "Cédric Belmant",
@@ -26,8 +54,10 @@ bl_info = {
 
 
 def register():
-    print("Quietude registered.")
+    auto_load.register()
+    logger.debug("Quietude registered.")
 
 
 def unregister():
-    print("Unregistering Quietude.")
+    logger.debug("Unregistering Quietude.")
+    auto_load.unregister()

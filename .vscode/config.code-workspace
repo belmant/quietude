@@ -1,7 +1,12 @@
 {
     "folders": [
         {
-            "path": ".."
+            "path": "..",
+            "name": "Github Quietude"
+        },
+        {
+            "path": "../external/blender-2.82/2.82/scripts/addons/quietude",
+            "name": "In-blender Quietude"
         }
     ]
 }
