@@ -1,3 +1,4 @@
+*.blend1
 temp.txt
 *.pyc
 blender_build

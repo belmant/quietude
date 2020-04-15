@@ -1,6 +1,7 @@
 {
     "python.linting.enabled": false,
     "python.autoComplete.extraPaths": [
-        "C:/Users/cedri/Documents/Programming/blender/quietude/external/blender-2.82/2.82/scripts/modules"
+        "C:/Users/cedri/Documents/Programming/blender/quietude/external/blender-2.82/2.82/scripts/modules",
+        "C:/Users/cedri/Documents/Programming/blender/quietude/external/blender-2.82/2.82/scripts/addons/quietude",
     ]
 }

@@ -5,6 +5,7 @@ import typing
 import inspect
 import pkgutil
 import importlib
+from itertools import chain
 from pathlib import Path
 from pprint import pprint
 from .log import logger
@@ -20,7 +21,7 @@ ordered_classes = None
 
 def init_modules():
     global modules
-    modules = get_all_submodules(Path(f"{Path(__file__).parent}"))
+    modules = get_all_submodules()
 
 def init_classes():
     global ordered_classes
@@ -29,18 +30,18 @@ def init_classes():
 
 def register():
     if ordered_classes:
-        logger.debug(f"--- Registering classes")
+        logger.debug(f"\033[32;1;1m--- Registering classes\033[m")
     for cls in ordered_classes:
-        logger.debug(f"    --> {cls.__name__}")
+        logger.debug(f"    \033[33;1;1m--> {cls.__name__}\033[m")
         bpy.utils.register_class(cls)
 
 
-    logger.debug("--- Registering modules")
+    logger.debug("\033[32;1;1m--- Registering modules\033[m")
     for module in modules:
         if module.__name__ == __name__:
             continue
         if hasattr(module, "register"):
-            logger.debug(f"    --> {module.__name__}")
+            logger.debug(f"    \033[33;1;1m--> {module.__name__}\033[m")
             module.register()
     print("\n" * 5)
 
@@ -64,23 +65,35 @@ def unregister():
 # Import modules
 #################################################
 
-def get_all_submodules(directory):
-    return list(iter_submodules(directory, directory.name))
+def get_all_submodules():
+    return list(_find_all_importables(sys.modules[__package__]))
+
+def _find_all_importables(pkg):
+    """Find all importables in the project.
+    Return them in order.
+    """
+    return set(chain.from_iterable(_discover_path_importables(Path(p), pkg.__name__) for p in pkg.__path__))
 
 
-def iter_submodules(path, package_name):
-    for name in sorted(iter_submodule_names(path)):
-        yield importlib.import_module("." + name, package_name)
+def _discover_path_importables(pkg_pth, pkg_name):
+    """Yield all importables under a given path and package."""
+    for dir_path, _d, file_names in os.walk(pkg_pth):
+        pkg_dir_path = Path(dir_path)
 
+        if pkg_dir_path.parts[-1] == '__pycache__':
+            continue
 
-def iter_submodule_names(path, root=""):
-    for _, module_name, is_package in pkgutil.iter_modules([str(path)]):
-        if is_package:
-            sub_path = path / module_name
-            sub_root = root + module_name + "."
-            yield from iter_submodule_names(sub_path, sub_root)
-        else:
-            yield root + module_name
+        if all(Path(_).suffix != '.py' for _ in file_names):
+            continue
+
+        rel_pt = pkg_dir_path.relative_to(pkg_pth)
+        pkg_pref = '.'.join((pkg_name, ) + rel_pt.parts)
+        yield from (
+            importlib.import_module(pkg_path)
+            for _, pkg_path, _ in pkgutil.walk_packages(
+                (str(pkg_dir_path), ), prefix=f'{pkg_pref}.',
+            )
+        )
 
 
 # Find classes to register

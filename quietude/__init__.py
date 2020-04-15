@@ -19,10 +19,9 @@
 import importlib
 from .log import logger
 
-reimport = 'bpy' in locals()
-if reimport:
+logger.debug("\033[34;1;1m========== START ==========\033[m")
 
-    logger.debug("Reimporting all modules.")
+reimport = 'bpy' in locals()
 
 if reimport:
     importlib.reload(auto_load)
@@ -32,13 +31,15 @@ else:
 auto_load.init_modules()
 
 if reimport:
+    logger.debug("\033[32;1;1m--- Reimporting modules\033[m")
     for module in auto_load.modules:
         if 'auto_load' not in module.__name__:
-            importlib.reload(module)
+            logger.debug(f"    \033[33;1;1m--> {module.__name__}\033[m")
+            globals()[module.__name__.strip('quietude.')] = importlib.reload(module)
 else:
     for module in auto_load.modules:
         if 'auto_load' not in module.__name__:
-            importlib.import_module(module.__name__)
+            globals()[module.__name__.strip('quietude.')] = importlib.import_module(module.__name__)
 
 auto_load.init_classes()
 
@@ -55,9 +56,11 @@ bl_info = {
 
 def register():
     auto_load.register()
+    keymaps.register_keymaps()
     logger.debug("Quietude registered.")
 
 
 def unregister():
     logger.debug("Unregistering Quietude.")
+    keymaps.unregister_keymaps()
     auto_load.unregister()

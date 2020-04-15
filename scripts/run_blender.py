@@ -4,17 +4,19 @@ import sys
 import subprocess
 import re
 from glob import glob
+from pathlib import Path
 
 
 def parse_cli():
     parser = argparse.ArgumentParser()
 
-    python_flag_names = ["--test", "--install"]
+    python_flag_names = ["--test", "--install", "--override"]
     python_flags = []
 
     parser.add_argument('--bversion', type=str, default='2.82', help="Blender version to run.")
-    parser.add_argument(python_flag_names[0], action='store_true', help="Runs tests only.")
+    parser.add_argument(python_flag_names[0], type=int, default=0, help="Runs the test corresponding to the provided number and exits. No tests are run for a value of zero (default).")
     parser.add_argument(python_flag_names[1], action='store_true', help="Installs the addon (zips it and imports it from within Blender).")
+    parser.add_argument(python_flag_names[2], action='store_true', help='Overrides existing addon, if one has already been installed.')
     args, blender_flags = parser.parse_known_args()
 
     for flag in python_flag_names:
@@ -37,10 +39,10 @@ def get_executable_extension():
 
 
 def main(blender, blender_flags, python_call):
-    local_python = os.path.join(os.getcwd(), "scripts")
-    os.environ["LOCAL_PYTHONPATH"] = local_python
+    local_python = Path(os.getcwd()).joinpath("scripts")
+    os.environ["LOCAL_PYTHONPATH"] = str(local_python)
 
-    cmd = f".{os.sep}{blender} {' '.join(blender_flags)} {python_call}"
+    cmd = f"{str(Path(f'./{blender}'))} {' '.join(blender_flags)} {python_call}"
     print(cmd)
     result = int(os.system(cmd))
     if 0 == result:
@@ -67,8 +69,11 @@ if __name__ == "__main__":
     python_file = "scripts/loader.py"
     python_call = f"--python \"{python_file}\""
 
-    if "--test" in python_flags and '-b' not in blender_flags:
+    test_flag = re.search(r"--test=(\d+)", " ".join(python_flags))
+
+    if test_flag and '-b' not in blender_flags:
         blender_flags.append('-b')
+        blender_flags.insert(0, str(Path(f'blendfiles/test_{test_flag.group(1)}.blend')))
 
     if python_flags:
         python_call += f" -- {' '.join(python_flags)}"
