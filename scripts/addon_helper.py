@@ -20,14 +20,14 @@ def zip_target(target, target_location):
     zf.close()
 
 
-def install_addon(addon_name, override=False):
+def install_addon(addon_name):
     source_location = addon_name
     zip_location = source_location + ".zip"
     if os.path.exists(zip_location):
         os.remove(zip_location)
 
     zip_target(source_location, zip_location)
-    bpy.ops.preferences.addon_install(overwrite=override, filepath=os.path.abspath(zip_location))
+    bpy.ops.preferences.addon_install(overwrite=True, filepath=os.path.abspath(zip_location))
     bpy.ops.preferences.addon_enable(module=addon_name)
     os.remove(zip_location)
 

@@ -31,7 +31,7 @@ def parse_cli():
 
 
 def run_pytest(test_number):
-    test_dirs = os.listdir("tests")
+    test_dirs = [item for item in os.listdir("tests") if item.startswith("test_")]
     python_files = [Path(f"tests/{test_dir}/{test_file}") for test_dir in test_dirs for test_file in os.listdir(f"tests/{test_dir}") if test_file.endswith('.py')]
     ignore_flags = [f"--ignore={python_file}" for python_file in python_files if python_file.parent.name != f"test_{test_number}"]
     if not test_dirs or len(ignore_flags) == len(python_files):
@@ -52,10 +52,17 @@ def main():
     if install:
         path = addon_helper.get_addon_path(ADDON)
         if path.exists():
-            print(f"Removing addon {ADDON}.")
-            shutil.rmtree(path)
-        print(f"Installing addon {ADDON}.")
-        addon_helper.install_addon(ADDON, override=override)
+            is_empty = os.listdir(path) == []
+            if not(is_empty):
+                if override:
+                    print(f"Removing addon {ADDON}.")
+                    shutil.rmtree(path)
+                else:
+                    print("Addon already installed and no --override flag was provided.")
+        if not path.exists() or is_empty or override:
+            print(f"Installing addon {ADDON}.")
+            addon_helper.install_addon(ADDON)
+        
     if test:
         run_pytest(test_number=test)
 
