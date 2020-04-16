@@ -28,7 +28,6 @@ install:
     - python scripts/travis/get_blender.py --bversion=${BLENDER_VERSION}
 
 script:
-    - cd ${TRAVIS_BUILD_DIR}
     - python tests/run_all_tests.py --bversion=${BLENDER_VERSION} --override
     # - bash <(curl -s https://codecov.io/bash)
 

@@ -24,15 +24,15 @@ def main():
     return_codes = []
 
     for number in test_numbers:
-        flags = f"--bversion={bversion} --install --test={number}"
+        flags = [f"--bversion={bversion}", "--install", f"--test={number}"]
         if override:
-            flags += " --override"
-        p = subprocess.run(f"python scripts/run_blender.py {flags}")
+            flags.append("--override")
+        p = subprocess.run(["python", "scripts/run_blender.py", *flags])
         return_codes.append(p.returncode)
     
     if any(return_codes):
         failed_indices = [str(index + 1) for index, code in enumerate(return_codes) if code]
-        print(f"Test failed for test subdirectories number {' '.join(failed_indices)}")
+        print(f"Test failed for test subdirectories {', '.join(failed_indices)}")
         sys.exit(1)
     else:
         print("All tests successfully passed!")
