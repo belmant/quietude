@@ -119,7 +119,7 @@ def install_python_dependencies(python):
     os.system(f"{python} -m ensurepip")
     os.system(f"{python} -m pip install -U pip")
     print("Installing Python dependencies.")
-    os.system(f"{python} -m pip install --upgrade -r {cwd}{os.sep}blender_requirements.txt -r {cwd}{os.sep}requirements.txt")
+    os.system(f"{python} -m pip install --upgrade -r {cwd}{os.sep}requirements_blender.txt -r {cwd}{os.sep}requirements.txt")
 
 
 def move_blender_archive_to_dest(cache_dir, dst, archive):
