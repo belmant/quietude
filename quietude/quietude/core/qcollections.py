@@ -1,6 +1,6 @@
 import bpy
 from ..utils import access, exceptions
-from ..blender_utils import collections_ as collections
+from ..blender_utils import bcollections as collections
 from ...log import logger
 import re
 from typing import *
@@ -8,19 +8,14 @@ from typing import *
 
 qcollection_number_pattern = re.compile(r"qcollection_(\d+)")
 
-active_qcollection_names = []
-
 QCOLLECTION_PREFIX = 'qcollection'
 QCOLLECTION_ROOT_NAME = 'Quietude'
 MAKE_QCOLLECTION_ROOT_VISIBLE = True
 
 class QCollection():
 
-    def __init__(self, properties: Optional[Mapping[str, bpy.types.Property]] = None):
+    def __init__(self):
         self.collection = QCollection.create_qcollection()
-        self.properties = properties
-        logger.debug(f"Active QCollections: {active_qcollection_names}")
-
 
     @classmethod
     def create_qcollection(cls):
@@ -42,6 +37,12 @@ class QCollection():
     def populate(self, objs):
         collections.populate_collection(self.collection, objs)
 
+def find_common_qcollection(objs):
+    qcollection_root = get_qcollection_root()
+    for qcollection in qcollection_root.children.values():
+        if all((obj.name in qcollection.objects for obj in objs)):
+            return qcollection
+        
 
 def extract_qcollection_number(qcollection_name):
     return int(re.search(qcollection_number_pattern, qcollection_name).group(1))
@@ -76,9 +77,26 @@ def iter_get_qcollection_numbers():
 def instance_qcollection(number):
     qcollection_root = get_qcollection_root()
     new_qcollection = bpy.data.collections.new(f'qcollection_{number}')
+    new_qcollection["modifiers"] = {}
     qcollection_root.children.link(new_qcollection)
-    active_qcollection_names.append(f'qcollection_{number}')
     return new_qcollection
 
+def get_modifier_name(qcollection, modifier_type):
+    qcol_modifier_names = list(qcollection["modifiers"].keys())
+    qcol_number = extract_qcollection_number(qcollection.name)
+    prefix = f"Q{qcol_number}_"
+    if qcol_modifier_names:
+        for index, number in enumerate(map(lambda x: int(re.search(f"{modifier_type}_(\\d+)", x).group(1)), qcol_modifier_names)):
+            if index + 1 != number:
+                return prefix + f"{modifier_type}_{index + 1}"
+        return prefix + f"{modifier_type}_{len(qcol_modifier_names)+1}"
+    return prefix + f"{modifier_type}_1"
 
-
+def fetch_qcollection(mesh_objs):
+    qcol = find_common_qcollection(mesh_objs)
+    if not qcol:
+        qcol_creator = QCollection()
+        qcol_creator.populate(mesh_objs)
+        qcol = qcol_creator.collection
+        logger.debug("Creating new qcollection.")
+    return qcol
