@@ -40,7 +40,7 @@ class QCollection():
 def find_common_qcollection(objs):
     qcollection_root = get_qcollection_root()
     for qcollection in qcollection_root.children.values():
-        if all((obj.name in qcollection.objects for obj in objs)):
+        if set(objs) == set(qcollection.objects):
             return qcollection
         
 
