@@ -16,10 +16,10 @@ def test_qcollections_children_of_root():
 
 def test_qcollections_fill_empty_name_slots_at_creation():
     bpy.data.objects['Cylinder'].select_set(True)
-    bpy.ops.quietude.add_collection_modifier()
+    bpy.ops.quietude.add_qcollection_modifier()
     bpy.data.collections.remove(bpy.data.collections['qcollection_2'])
     bpy.data.objects['Cylinder'].select_set(False)
-    bpy.ops.quietude.add_collection_modifier()
+    bpy.ops.quietude.add_qcollection_modifier()
     assert(bcollections.is_collection_present('qcollection_1'))
     assert(bcollections.is_collection_present('qcollection_2'))
     assert(bcollections.is_collection_present('qcollection_3'))

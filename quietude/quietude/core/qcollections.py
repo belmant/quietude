@@ -12,6 +12,13 @@ QCOLLECTION_PREFIX = 'qcollection'
 QCOLLECTION_ROOT_NAME = 'Quietude'
 MAKE_QCOLLECTION_ROOT_VISIBLE = True
 
+def instance_qcollection(number):
+    qcollection_root = get_qcollection_root()
+    new_qcollection = bpy.data.collections.new(f'qcollection_{number}')
+    new_qcollection["modifiers"] = {}
+    qcollection_root.children.link(new_qcollection)
+    return new_qcollection
+
 class QCollection():
 
     def __init__(self):
@@ -21,7 +28,7 @@ class QCollection():
     def create_qcollection(cls):
         """Creates a new qcollection, with the smallest number possible.
         """
-        qcollection_root = get_qcollection_root()
+        qcollection_root = get_qcollection_root(create_auto=True, warn=True)
         qcollections = list(qcollection_root.children.values())
         logger.debug(f"QCollections: {qcollections}")
         if not qcollections:
@@ -39,16 +46,17 @@ class QCollection():
 
 def find_common_qcollection(objs):
     qcollection_root = get_qcollection_root()
-    for qcollection in qcollection_root.children.values():
-        if set(objs) == set(qcollection.objects):
-            return qcollection
+    if qcollection_root:
+        for qcollection in qcollection_root.children.values():
+            if set(objs) == set(qcollection.objects):
+                return qcollection
         
 
 def extract_qcollection_number(qcollection_name):
     return int(re.search(qcollection_number_pattern, qcollection_name).group(1))
 
-def get_qcollection_root(create_auto=True):
-    qcollection_root = access.get_key(QCOLLECTION_ROOT_NAME, bpy.data.collections)
+def get_qcollection_root(create_auto=False, warn=False):
+    qcollection_root = access.get_key(QCOLLECTION_ROOT_NAME, bpy.data.collections, warn=warn)
     if not qcollection_root and create_auto:
         qcollection_root = bpy.data.collections.new(QCOLLECTION_ROOT_NAME)
         if MAKE_QCOLLECTION_ROOT_VISIBLE:
@@ -73,13 +81,6 @@ def iter_find_obj_in_qcollections(obj_name):
 def iter_get_qcollection_numbers():
     qcollection_root = get_qcollection_root()
     yield from sorted(map(extract_qcollection_number, qcollection_root.children.keys()))
-
-def instance_qcollection(number):
-    qcollection_root = get_qcollection_root()
-    new_qcollection = bpy.data.collections.new(f'qcollection_{number}')
-    new_qcollection["modifiers"] = {}
-    qcollection_root.children.link(new_qcollection)
-    return new_qcollection
 
 def get_modifier_name(qcollection, modifier_type):
     qcol_modifier_names = list(qcollection["modifiers"].keys())

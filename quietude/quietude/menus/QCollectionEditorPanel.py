@@ -12,10 +12,8 @@ class QCollectionEditorPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        qcollection_root = qcollections.get_qcollection_root(create_auto=False)
-        if qcollection_root:
-            qcol_active = qcollections.find_common_qcollection([context.active_object])
-            layout.label(text="QCollections Editor")
-            col = layout.column()
-            col.template_list("QCOLLECTION_UI_qcollections_list", "", qcollection_root, propname="children", active_dataptr=qcol_active, active_propname="", rows=5)
-        
+        qcol_root = qcollections.get_qcollection_root()
+        layout.label(text="Available QCollections")
+        col = layout.column()
+        qcol_active = qcollections.find_common_qcollection([context.active_object])
+        col.template_list("QCOLLECTION_UI_qcollections_list", "", qcol_root, propname="children", active_dataptr=qcol_active, active_propname="", rows=5)        

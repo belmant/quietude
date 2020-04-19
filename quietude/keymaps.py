@@ -30,7 +30,7 @@ def set_properties(kmi, properties_dict):
 
 def register_keymaps():
     addon = bpy.context.window_manager.keyconfigs.addon
-    if not addon:
+    if not addon: # blender run in background mode
         return
     km = addon.keymaps.new(name = "3D View", space_type = "VIEW_3D")
     for kmi_dict in kmi_dictlist:
