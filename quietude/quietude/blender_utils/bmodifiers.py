@@ -6,6 +6,9 @@ from pathlib import Path
 
 MODIFIER_PROPERTIES = read.yaml(Path(f"{Path(__file__).parent}/mappings/modifier_properties.yml"))
 
+def has_modifier(obj, modifier_name):
+    return modifier_name in obj.modifiers
+
 def link_modifier_to_collection(modifier_type, modifier_name, collection, template_obj):
     properties = MODIFIER_PROPERTIES[modifier_type.lower()]
     collection["modifiers"][modifier_name] = {

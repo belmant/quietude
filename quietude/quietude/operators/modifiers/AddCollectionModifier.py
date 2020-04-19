@@ -3,9 +3,9 @@ from ...blender_utils import bmodifiers, baccess
 from ...core import qcollections
 
 available_modifiers = [
-    ("DISPLACE", "Displace", "Displace modifier"), 
+    ("MIRROR", "Mirror", "Mirror modifier"),
     ("ARRAY", "Array", "Array modifier"),
-    ("MIRROR", "Mirror", "Mirror modifier")
+    ("DISPLACE", "Displace", "Displace modifier")
     ]
 
 class AddCollectionModifier(bpy.types.Operator):
