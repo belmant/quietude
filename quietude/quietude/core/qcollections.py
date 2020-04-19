@@ -47,9 +47,9 @@ def find_common_qcollection(objs):
 def extract_qcollection_number(qcollection_name):
     return int(re.search(qcollection_number_pattern, qcollection_name).group(1))
 
-def get_qcollection_root():
+def get_qcollection_root(create_auto=True):
     qcollection_root = access.get_key(QCOLLECTION_ROOT_NAME, bpy.data.collections)
-    if not qcollection_root:
+    if not qcollection_root and create_auto:
         qcollection_root = bpy.data.collections.new(QCOLLECTION_ROOT_NAME)
         if MAKE_QCOLLECTION_ROOT_VISIBLE:
             bpy.context.scene.collection.children.link(qcollection_root)

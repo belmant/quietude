@@ -12,7 +12,7 @@ kmi_dictlist = [
         'alt': False,
         'oskey': False,
         'properties': {
-            'name': 'VIEW3D_MT_CollectionPieMenu'
+            'name': 'VIEW3D_MT_QCollectionPieMenu'
         }
     }
 ]
@@ -30,6 +30,8 @@ def set_properties(kmi, properties_dict):
 
 def register_keymaps():
     addon = bpy.context.window_manager.keyconfigs.addon
+    if not addon:
+        return
     km = addon.keymaps.new(name = "3D View", space_type = "VIEW_3D")
     for kmi_dict in kmi_dictlist:
         properties_dict = extract_properties(kmi_dict)

@@ -8,15 +8,15 @@ available_modifiers = [
     ("DISPLACE", "Displace", "Displace modifier")
     ]
 
-class AddCollectionModifier(bpy.types.Operator):
-    bl_idname = "quietude.add_collection_modifier"
-    bl_label = "Add Collection Modifier"
-    bl_description = "Adds a modifier on all objects from the same collection at once"
+class AddQCollectionModifier(bpy.types.Operator):
+    bl_idname = "quietude.add_qcollection_modifier"
+    bl_label = "Add QCollection Modifier"
+    bl_description = "Adds a QCollection modifier."
     bl_options = {"REGISTER", "UNDO"}
 
     modifier_type: bpy.props.EnumProperty(items=available_modifiers,
-                                          name="Collection modifiers",
-                                          description="Modifiers that can be applied to a collection"
+                                          name="QCollection modifiers",
+                                          description="Modifiers that can be applied to a QCollection"
                                           )
 
     @classmethod
